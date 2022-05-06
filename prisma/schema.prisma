@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  books Book[]
+
+  @@map("authors")
+}
+
+model Book {
+  id Int @id @default(autoincrement())
+  name String
+  authorId Int @map("author_id")
+  author Author @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  genres GenreBooks[]
+
+  @@map("books")
+}
+
+model Genre {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  books GenreBooks[]
+
+  @@map("genres")
+}
+
+model GenreBooks {
+  book Book @relation(fields: [bookId], references: [id])
+  bookId Int @map("book_id")
+  genre Genre @relation(fields: [genreId], references: [id])
+  genreId Int @map("genre_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([genreId, bookId])
+  @@map("genre_books")
+}
